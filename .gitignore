@@ -6,3 +6,11 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+.idea
+.venv
+
+
+# lambda folders
+lambda/app_agent_knowledge_items_package
+lambda/dependencies_layer
