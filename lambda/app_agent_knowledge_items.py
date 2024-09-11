@@ -3,6 +3,9 @@ import boto3
 import json
 import os
 import uuid
+import requests
+from bs4 import BeautifulSoup
+
 
 from datetime import datetime
 
@@ -76,13 +79,30 @@ def handler(event, context):
 
 def find_url_details(url: str):
     logger.info(f"url received: {url}")
-    result = {
-        "source": url,
-        "title": "Dev website from jettro coenradie",
-        "knowledge": "Jettro writes about LLMs, search and other Gen AI topics"
-    }
-    return result
 
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        title = soup.title.string if soup.title else 'No title found'
+        description_tag = soup.find('meta', attrs={'name': 'description'})
+        description = description_tag['content'] if description_tag else 'No description found'
+
+        result = {
+            "source": url,
+            "title": title,
+            "knowledge": description
+        }
+    except requests.RequestException as e:
+        logger.error(f"Error fetching URL: {e}")
+        result = {
+            "source": url,
+            "title": "Error",
+            "knowledge": "Could not retrieve information"
+        }
+
+    return result
 
 def store_knowledge(title: str, knowledge: str, source: str):
     logger.info(f"knowledge received {knowledge}")
