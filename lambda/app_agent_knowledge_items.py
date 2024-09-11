@@ -22,10 +22,14 @@ def handler(event, context):
     agent = event['agent']
     action_group = event['actionGroup']
     api_path = event['apiPath']
-    parameters = event['requestBody']['content']['application/json']['properties']
-
     logger.info(f"Calling function with API path: {api_path}")
-    logger.info(f"Calling with parameters: {parameters}")
+
+    parameters = event.get('requestBody', {}).get('content', {}).get('application/json', {}).get('properties', [])
+    if not parameters:
+        logger.warning("No parameters found in the event")
+    else:
+        logger.info(f"Calling with parameters: {parameters}")
+
 
     # Execute your business logic here. For more information, refer to: https://docs.aws.amazon.com/bedrock/latest/userguide/agents-lambda.html
     if api_path == '/find-url':
@@ -41,7 +45,12 @@ def handler(event, context):
         source = next((param['value'] for param in parameters if param['name'] == 'source'), None)
 
         # create knowledge
-        function_response = store_knowledge(title=title, knowledge=knowledge_value, source=source)
+        function_response = json.dumps(store_knowledge(title=title, knowledge=knowledge_value, source=source))
+    elif api_path == '/list-knowledge':
+        logger.info("About to list the knowledge")
+        num_items = next((param['value'] for param in parameters if param['name'] == 'num_items'), 10)
+        continuation_token = next((param['value'] for param in parameters if param['name'] == 'continuation_token'), None)
+        function_response = json.dumps(list_knowledge(num_items, continuation_token))
     else:
         function_response = f"API Path is unknown {api_path}"
 
@@ -93,3 +102,22 @@ def store_knowledge(title: str, knowledge: str, source: str):
     return {
         "message": "The provided knowledge item is stored."
     }
+
+
+def list_knowledge(num_items, continuation_token):
+    scan_kwargs = {
+        'Limit': num_items
+    }
+    if continuation_token:
+        scan_kwargs['ExclusiveStartKey'] = json.loads(continuation_token)
+
+    response = table.scan(**scan_kwargs)
+    items = response.get('Items', [])
+    next_token = response.get('LastEvaluatedKey', None)
+
+    result = {
+        'knowledgeItems': items
+    }
+    if next_token:
+        result['continuationToken'] = json.dumps(next_token)
+    return result

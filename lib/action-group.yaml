@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Knowledge Items API
-  description: Actions that Bedrock Agents can take to complete and store knowledge items.
-  version: 1.0.0
+  description: Actions that Bedrock Agents can take to complete and store knowledge items. Use the continuation token to obtain the next page of knowledge items.
+  version: 1.1.1
 paths:
   /find-url:
     post:
@@ -86,6 +86,55 @@ paths:
                 type: object
                 properties:
                   error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /list-knowledge:
+    post:
+      summary: List knowledge items per page.
+      description: List all knowledge items supports obtaining the next page with max items per page.
+      operationId: list-knowledge
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                num_items:
+                  type: integer
+                continuation_token:
+                  type: string
+      responses:
+        '200':
+          description: Knowledge items found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  knowledgeItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        knowledge:
+                          type: string
+                        source:
+                          type: string
+                        create_date:
+                          type: string
+                  continuation_token:
                     type: string
         '500':
           description: Internal server error
