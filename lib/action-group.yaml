@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Knowledge Items API
+  description: Actions that Bedrock Agents can take to complete and store knowledge items.
+  version: 1.0.0
+paths:
+  /find-url:
+    post:
+      summary: Use the URL to obtain a title and the knowledge.
+      description: Use the URL to obtain a title and the knowledge.
+      operationId: find-url
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+      responses:
+        '200':
+          description: URL found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  source:
+                    type: string
+                  title:
+                    type: string
+                  knowledge:
+                    type: string
+
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /store-knowledge:
+    post:
+      summary: Store the knowledge item.
+      description: Store the knowledge item.
+      operationId: store-knowledge
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                knowledge:
+                  type: string
+                source:
+                  type: string
+      responses:
+        '200':
+          description: Knowledge stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string

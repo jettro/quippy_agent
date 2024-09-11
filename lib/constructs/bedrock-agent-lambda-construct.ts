@@ -26,11 +26,12 @@ export class BedrockAgentLambdaConstruct extends Construct {
             timeout: cdk.Duration.seconds(60),
         });
 
-        // Add permissions for the Lambda function to call Bedrock
-        // this.bedrockAgentLambda.addToRolePolicy(new iam.PolicyStatement({
-        //     actions: ['bedrock:InvokeAgent'],
-        //     resources: ['*'],  // Replace with more specific resource ARNs if possible
-        // }));
+        const principal = new iam.ServicePrincipal("bedrock.amazonaws.com");
 
+        // Add permission for Bedrock to call the Lambda function
+        this.bedrockAgentLambda.addPermission("agent-invoke-lambda", {
+            principal: principal,
+            action: "lambda:InvokeFunction",
+        })
     }
 }
