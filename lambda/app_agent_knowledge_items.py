@@ -34,7 +34,6 @@ def handler(event, context):
         logger.info(f"Calling with parameters: {parameters}")
 
 
-    # Execute your business logic here. For more information, refer to: https://docs.aws.amazon.com/bedrock/latest/userguide/agents-lambda.html
     if api_path == '/find-url':
         # One parameter with the name url of type string
         url_to_find = next((param['value'] for param in parameters if param['name'] == 'url'), None)

@@ -30,7 +30,10 @@ export class QuippyCdkAgentStack extends cdk.Stack {
 
         const agent = new bedrock.Agent(this, 'Agent', {
             foundationModel: bedrock.BedrockFoundationModel.ANTHROPIC_CLAUDE_V2_1,
-            instruction: 'You are a helpful and friendly agent that assists in storing knowledge items. There are two tools you can use. One uses a URL as input. That tool obtains more information about the URL like the title and the knowledge provided by the website from the URL. The other tool takes the title, source and knowledge to store it somewhere.',
+            instruction: 'You are a helpful and friendly agent that assists in storing knowledge items. ' +
+                'There are two tools you can use. One uses a URL as input. That tool obtains more information ' +
+                'about the URL like the title and the knowledge provided by the website from the URL. The ' +
+                'other tool takes the title, source and knowledge to store it somewhere.',
             enableUserInput: true,
             shouldPrepareAgent: true
         });
